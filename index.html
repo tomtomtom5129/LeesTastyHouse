@@ -1,0 +1,1995 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Lee's Tasty House - Online Order</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #333;
+            --accent: #c9a227;
+            --light: #f8f8f8;
+            --white: #ffffff;
+            --gray: #666;
+            --border: #e0e0e0;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-lg: 0 4px 20px rgba(0,0,0,0.12);
+        }
+        
+        html, body {
+            height: auto;
+            min-height: 100%;
+            overflow-x: hidden;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #ffffff;
+            padding-bottom: 350px;
+            color: #1a1a1a;
+        }
+        
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+            padding: 12px 20px;
+        }
+        
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+        
+        .logo-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .cart-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            padding: 8px;
+        }
+        
+        .cart-btn .material-icons {
+            font-size: 28px;
+            color: var(--primary);
+        }
+        
+        .history-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            padding: 8px;
+            display: none;
+        }
+        
+        .history-btn img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+        
+        .history-btn:hover .history-tooltip {
+            display: block;
+        }
+        
+        .history-tooltip {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            min-width: 200px;
+            box-shadow: var(--shadow);
+            z-index: 1001;
+            font-size: 13px;
+        }
+        
+        .history-tooltip h4 {
+            margin: 0 0 8px 0;
+            color: var(--primary);
+            font-size: 14px;
+        }
+        
+        .history-tooltip .history-item {
+            padding: 4px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .history-tooltip .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-tooltip .reorder-link {
+            display: block;
+            margin-top: 8px;
+            padding: 6px 12px;
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 12px;
+        }
+        
+        .cart-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--accent);
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 600;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Navigation */
+        .top-nav {
+            position: fixed;
+            top: 65px;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            z-index: 999;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 10px 20px;
+            -webkit-overflow-scrolling: touch;
+            box-shadow: var(--shadow);
+        }
+        
+        .nav-btn {
+            display: inline-block;
+            background: var(--white);
+            color: var(--primary);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 20px;
+            margin: 0 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+        
+        /* Info Section */
+        .info-section {
+            padding: 150px 20px 30px;
+            background: var(--light);
+        }
+        
+        .info-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .info-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        
+        .info-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+        
+        .deal-item {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        
+        .deal-item:last-child {
+            border-bottom: none;
+        }
+        
+        .deal-note {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 12px;
+            font-style: italic;
+        }
+        
+        /* Main Content */
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 200px 20px 100px;
+        }
+        
+        .category-section {
+            margin-bottom: 40px;
+        }
+        
+        .category-title {
+            font-size: 20px;
+            font-weight: 500;
+            padding: 16px 0;
+            margin-bottom: 16px;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        /* Menu Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        tr {
+            border-bottom: 1px solid var(--border);
+        }
+        
+        td {
+            padding: 12px 8px;
+            vertical-align: middle;
+        }
+        
+        .item-number {
+            color: var(--gray);
+            font-size: 12px;
+            width: 50px;
+        }
+        
+        .item-name {
+            font-size: 14px;
+        }
+        
+        .item-desc {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+        
+        .price-col {
+            text-align: right;
+            white-space: nowrap;
+            font-weight: 500;
+            min-width: 120px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Item Controls */
+        .item-control {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 12px;
+            float: right;
+        }
+        
+        .item-control button {
+            width: 28px;
+            height: 28px;
+            border: 1px solid var(--border);
+            background: var(--white);
+            color: var(--primary);
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .item-control button:hover {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+        
+        .item-control button.minus:hover {
+            background: #c0392b;
+            border-color: #c0392b;
+        }
+        
+        .item-control button.plus:hover {
+            background: #27ae60;
+            border-color: #27ae60;
+        }
+        
+        .item-control span {
+            min-width: 24px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        /* Combo Row */
+        .combo-row {
+            background: var(--light);
+        }
+
+        .combo-row td {
+            padding: 10px 8px;
+        }
+        
+        .combo-name {
+            font-weight: 500;
+            font-size: 15px;
+        }
+        
+        .combo-items {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+        
+        .item-name-indent {
+            padding-left: 32px;
+            color: var(--gray);
+            font-size: 12px;
+            line-height: 1.3;
+        }
+
+        /* Compact combo rows */
+        .combo-row td {
+            padding: 8px;
+        }
+
+        tr:has(.item-name-indent) td {
+            padding: 2px 8px;
+        }
+
+        /* Compact combo rows */
+        .combo-row td {
+            padding: 8px;
+        }
+
+        tr:has(.item-name-indent) td {
+            padding: 2px 8px;
+        }
+        
+        /* Cart Sidebar */
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: var(--white);
+            z-index: 2000;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .cart-sidebar.active {
+            right: 0;
+        }
+        
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .cart-header h3 {
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        .close-cart {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+        }
+        
+        .close-cart .material-icons {
+            font-size: 24px;
+            color: var(--gray);
+        }
+        
+        .cart-items {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .cart-empty {
+            text-align: center;
+            color: var(--gray);
+            padding: 40px 0;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .cart-item-info {
+            flex: 1;
+        }
+        
+        .cart-item-name {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .cart-item-price {
+            font-size: 13px;
+            color: var(--gray);
+        }
+        
+        .cart-item-qty {
+            font-size: 14px;
+            font-weight: 500;
+            margin: 0 12px;
+        }
+        
+        .cart-item-remove {
+            background: none;
+            border: none;
+            color: #c0392b;
+        }
+        
+
+        
+        .delivery-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .delivery-table th {
+            background: var(--primary);
+            color: var(--white);
+            padding: 12px;
+            text-align: left;
+            font-weight: 500;
+            border-right: 1px solid var(--border);
+        }
+        
+        .delivery-table th:last-child {
+            text-align: center;
+            border-right: none;
+        }
+        
+        .delivery-table td {
+            padding: 12px;
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        
+        .delivery-table td:last-child {
+            border-right: none;
+        }
+        
+        .delivery-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .delivery-platform {
+            text-align: center;
+            vertical-align: middle;
+        }
+        
+        .platform-btn {
+            display: block;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-decoration: none;
+            color: #fff;
+            margin: 5px auto;
+            width: 140px;
+            text-align: center;
+        }
+        
+        .platform-btn.uber {
+            background: #000;
+        }
+        
+        .platform-btn.skip {
+            background: #f37021;
+        }
+        
+        .delivery-table th {
+            background: var(--primary);
+            color: var(--white);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 500;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .delivery-table td {
+            padding: 0;
+            border: none;
+            vertical-align: top;
+        }
+        
+        .delivery-table td:first-child {
+            border-right: 1px solid var(--border);
+        }
+        
+        .delivery-col {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .delivery-row {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .delivery-row:last-child {
+            border-bottom: none;
+        }
+        
+        .delivery-platform {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+        }
+        
+        .platform-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-decoration: none;
+            color: #fff;
+            width: 140px;
+            text-align: center;
+        }
+        
+        .platform-btn.uber {
+            background: #000;
+        }
+        
+        .platform-btn.skip {
+            background: #f37021;
+        }
+        
+        .delivery-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .delivery-table th {
+            background: var(--primary);
+            color: var(--white);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        .delivery-table th:first-child {
+            border-radius: 8px 0 0 0;
+        }
+        
+        .delivery-table th:last-child {
+            border-radius: 0 8px 0 0;
+            text-align: center;
+        }
+        
+        .delivery-table td {
+            padding: 16px;
+            border: 1px solid var(--border);
+            vertical-align: top;
+            line-height: 1.8;
+        }
+        
+        .delivery-table tr:last-child td:first-child {
+            border-radius: 0 0 0 8px;
+        }
+        
+        .delivery-table tr:last-child td:last-child {
+            border-radius: 0 0 8px 0;
+        }
+        
+        .delivery-table strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .platform-note {
+            font-size: 13px;
+            color: var(--gray);
+            margin-top: 8px;
+            font-style: italic;
+        }
+ 
+        
+        .cart-footer {
+            padding: 20px;
+            border-top: 2px solid var(--primary);
+            background: var(--light);
+        }
+        
+        .cart-summary {
+            margin-bottom: 16px;
+        }
+        
+        .cart-summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 14px;
+        }
+        
+        .cart-summary-row.total {
+            font-size: 18px;
+            font-weight: 600;
+            padding-top: 8px;
+            border-top: 1px solid var(--border);
+            margin-top: 8px;
+        }
+        
+        .checkout-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .checkout-btn:hover {
+            background: var(--secondary);
+        }
+        
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 1500;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .cart-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Footer Styles */
+        .footer {
+            background: var(--light);
+            padding: 40px 20px 100px;
+            text-align: center;
+        }
+        
+        .footer-contact-top {
+            margin-bottom: 30px;
+        }
+        
+        .footer-contact-top h4 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: var(--primary);
+        }
+        
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .contact-info p {
+            font-size: 16px;
+            color: var(--secondary);
+        }
+        
+        .footer-hours-bottom {
+            margin-bottom: 30px;
+        }
+        
+        .footer-hours-bottom h4 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: var(--primary);
+        }
+        
+        .hours-horizontal {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .hour-box {
+            background: var(--white);
+            padding: 12px 16px;
+            border-radius: 8px;
+            min-width: 80px;
+        }
+        
+        .hour-box span {
+            display: block;
+            font-size: 13px;
+        }
+        
+        .hour-box span:first-child {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+        
+        .hour-box span:last-child {
+            color: var(--gray);
+        }
+        
+        .hour-box .closed {
+            color: #c0392b;
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        
+        .footer-bottom p {
+            font-size: 13px;
+            color: var(--gray);
+        }
+        
+        /* Phone Order Bar */
+        .phone-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            padding: 12px 20px;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .phone-bar-info {
+            font-size: 14px;
+        }
+        
+        .phone-bar-total {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .phone-btn {
+            background: var(--accent);
+            color: var(--primary);
+            border: none;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .phone-btn:hover {
+            background: #b8941f;
+        }
+        
+        /* Custom Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+        
+        .modal-body {
+            font-size: 14px;
+            color: var(--dark);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .modal-body .order-date {
+            color: var(--gray);
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .modal-body .order-item {
+            padding: 4px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .modal-body .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .modal-body .order-total {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 2px solid var(--primary);
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .modal-btn.cancel {
+            background: var(--light);
+            color: var(--dark);
+        }
+        
+        .modal-btn.cancel:hover {
+            background: #e9ecef;
+        }
+        
+        .modal-btn.confirm {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .modal-btn.confirm:hover {
+            background: #c41e3a;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cart-sidebar {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .main-container {
+                padding: 130px 16px 80px;
+            }
+            
+            .price-col {
+                min-width: 100px;
+            }
+            
+            .item-control {
+                margin-left: 8px;
+                margin-right: 0;
+            }
+            
+            .phone-bar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 12px 16px;
+            }
+            
+            .phone-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+
+<header class="header">
+    <div class="header-content">
+        <div class="logo">
+            <img src="data/logo.png" alt="Lee's Tasty House Logo" class="logo-img">
+            <span class="logo-text">Lee's Tasty House</span>
+        </div>
+        <button class="history-btn" id="historyBtn" onclick="showLastOrder()" title="Last Order">
+            <img src="data/OIP.webp" alt="History" style="width: 24px; height: 24px; object-fit: contain;">
+        </button>
+        <button class="cart-btn" onclick="toggleCart()">
+            <span class="material-icons">shopping_cart</span>
+            <span class="cart-badge" id="cartBadge">0</span>
+        </button>
+    </div>
+</header>
+
+
+
+<!-- Info Section -->
+<section class="info-section">
+    <div class="info-container">
+        <div class="info-grid" style="grid-template-columns: 1fr;">
+            <!-- Deals -->
+            <div class="info-card" style="grid-column: 1 / -1;">
+                <h3>Special Deals <span style="font-size: 12px; font-weight: normal; color: var(--gray);">(Cash & Pickup Only)</span></h3>
+                <div class="deal-item">
+                    <strong>Free 3 Egg Rolls or 3 Spring Rolls</strong><br>
+                    When order over $60 before tax
+                </div>
+                <div class="deal-item">
+                    <strong>Free Sweet&Sour Pork or Sweet&Sour Chicken</strong><br>
+                    When order over $70 before tax
+                </div>
+                <div class="deal-item">
+                    <strong>Free Sesame Chicken or General Tso's Chicken</strong><br>
+                    When order over $80 before tax
+                </div>
+                <div class="deal-note">
+                    * Cannot combine with other offers. Not for special busy days.<br>
+                    * Please mention when ordering if you want Cash-Pick-Up deal.
+                </div>
+            </div>
+        </div>
+
+        <!-- Delivery Info -->
+        <div class="info-card" style="margin-top: 30px;">
+            <h3>Delivery Information</h3>
+            <p class="platform-note">For out of town deliveries, please call the restaurant to check the availability and Fee.
+                 Please note that you may pay higher price for using the Platform's Service.The extra goes to the platform.</p>
+            <div class="delivery-table-wrapper">
+                <table class="delivery-table">
+                    <tr>
+                        <th colspan="2">By Restaurant</th>
+                        <th>By Platform</th>
+                    </tr>
+                    <tr>
+                        <td style="width: 70%;" colspan="2">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="border-bottom: 1px solid #ddd; padding: 8px 5px; width: 50%;"><strong>Order Amount</strong></td>
+                                    <td style="border-bottom: 1px solid #ddd; padding: 8px 5px; width: 50%;"><strong>Delivery Fee</strong></td>
+                                </tr>
+                                <tr>
+                                    <td style="border-bottom: 1px solid #ddd; padding: 8px 5px;">$0.00 - $39.99</td>
+                                    <td style="border-bottom: 1px solid #ddd; padding: 8px 5px;">Not Available</td>
+                                </tr>
+                                <tr>
+                                    <td style="border-bottom: 1px solid #ddd; padding: 8px 5px;">$40.00 - $59.99</td>
+                                    <td style="border-bottom: 1px solid #ddd; padding: 8px 5px;">$6.00 (in town)</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 5px;">$60.00+</td>
+                                    <td style="padding: 8px 5px;">Free (in town)</td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="text-align: center; vertical-align: middle;">
+                            <a href="https://www.order.store/store/lees-tasty-house-17-holland-st-e/gI1y8jfqUUGa4U7cxh-EVQ" target="_blank" style="display: block; width: 100px; margin: 36px auto; padding: 8px 0; background: #06C167; color: #fff; text-decoration: none; border-radius: 20px; font-size: 11px; text-align: center; box-shadow: 0 4px 12px rgba(6, 193, 103, 0.4);">Uber Eats</a>
+                            <a href="https://www.skipthedishes.com/lees-tasty-house-holland-street" target="_blank" style="display: block; width: 100px; margin: 36px auto; padding: 8px 0; background: #999; color: #fff; text-decoration: none; border-radius: 20px; font-size: 11px; text-align: center;">SkipTheDishes</a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Navigation -->
+
+<nav class="top-nav">
+    <button class="nav-btn" onclick="window.open('data/menu.pdf', '_blank')">📄 Picture Menu</button>
+    <button class="nav-btn" data-target="family-dinners">Family Dinners</button>
+    <button class="nav-btn" data-target="pickup-specials">Pick-up Specials</button>
+    <button class="nav-btn" data-target="optional-dinners">Optional Dinners</button>
+    <button class="nav-btn" data-target="combo-one">Combo For One</button>
+    <button class="nav-btn" data-target="appetizer">Appetizer</button>
+    <button class="nav-btn" data-target="dim-sum">Dim Sum</button>
+    <button class="nav-btn" data-target="soup">Soup</button>
+    <button class="nav-btn" data-target="sweet-sour">Sweet & Sour</button>
+    <button class="nav-btn" data-target="chop-suey">Chop Suey</button>
+    <button class="nav-btn" data-target="chicken">Chicken</button>
+    <button class="nav-btn" data-target="beef">Beef</button>
+    <button class="nav-btn" data-target="pork">Pork</button>
+    <button class="nav-btn" data-target="seafood">Seafood</button>
+    <button class="nav-btn" data-target="egg-foo-young">Egg Foo Young</button>
+    <button class="nav-btn" data-target="vegetables">Vegetables</button>
+    <button class="nav-btn" data-target="fried-rice">Fried Rice</button>
+    <button class="nav-btn" data-target="noodles">Noodles</button>
+    <button class="nav-btn" data-target="pad-thai">Pad Thai</button>
+    <button class="nav-btn" data-target="shanghai-noodles">Shanghai Noodles</button>
+    <button class="nav-btn" data-target="lo-mein">Lo Mein</button>
+    <button class="nav-btn" data-target="chef-special">Chef's Special</button>
+    <button class="nav-btn" data-target="beverages">Beverages</button>
+</nav>
+
+<!-- Info Section -->
+<div class="main-container">
+
+    <div id="family-dinners" class="category-section">
+        <h2 class="category-title">Family Dinners</h2>
+        <table>
+            <tbody>
+                <tr class="combo-row"><td colspan="2"><b>Dinner For Two (2A) - $36.99</b> <div class="item-control" data-id="2A" data-price="36.99" data-name="Dinner For Two (2A)"><button class="qty-btn minus" onclick="updateQty('2A', -1)">-</button><span class="qty-display" id="qty-2A">0</span><button class="qty-btn plus" onclick="updateQty('2A', 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Egg Roll (2)</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Sweet and sour chicken balls</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken chop suey</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken fried rice</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Fortune cookies (2)</td><td class="price-col"></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr class="combo-row"><td colspan="2"><b>Dinner For Two (2B) - $37.99</b> <div class="item-control" data-id="2B" data-price="37.99" data-name="Dinner For Two (2B)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-2B">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Spring Roll (2)</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Sweet and Sour Pork</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Beef with mixed vegetables</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">BBQ pork fried rice</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Fortune cookies (2)</td><td class="price-col"></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr class="combo-row"><td colspan="2"><b>Dinner For Three (3A) - $51.99</b> <div class="item-control" data-id="3A" data-price="51.99" data-name="Dinner For Three (3A)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-3A">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Egg roll (3)</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Sweet and sour chicken balls</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Sweet and Sour Pork</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken chop suey</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken fried rice</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Fortune cookies (3)</td><td class="price-col"></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr class="combo-row"><td colspan="2"><b>Dinner For Three (3B) - $53.99</b> <div class="item-control" data-id="3B" data-price="53.99" data-name="Dinner For Three (3B)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-3B">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Spring Roll (3)</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Crispy chicken wings</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">General Tso's chicken (spicy)</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Beef with mixed vegetables</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">BBQ Pork Fried Rice</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Fortune cookies (3)</td><td class="price-col"></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr class="combo-row"><td colspan="2"><b>Dinner For Four (4A) - $66.99</b> <div class="item-control" data-id="4A" data-price="66.99" data-name="Dinner For Four (4A)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-4A">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Egg roll (4)</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken chop suey</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Sweet and sour chicken balls</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">General Tso's chicken (spicy)</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Beef broccoli</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken fried rice</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Fortune cookies (4)</td><td class="price-col"></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr class="combo-row"><td colspan="2"><b>Dinner For Four (4B) - $69.99</b> <div class="item-control" data-id="4B" data-price="69.99" data-name="Dinner For Four (4B)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Spring roll (4)</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Lemon chicken</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Breaded shrimp</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Beef with mixed vegetables</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Tai dop voy</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">BBQ pork fried rice</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Fortune cookies (4)</td><td class="price-col"></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr class="combo-row"><td colspan="2"><b>Dinner For Five - $83.99</b> <div class="item-control" data-id="D5" data-price="83.99" data-name="Dinner For Five"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Egg roll (5)</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Sweet and sour chicken balls</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Crispy chicken wings</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">General Tso's chicken (spicy)</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Beef with mixed vegetables</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken chop suey</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken fried rice (L)</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Fortune cookies (5)</td><td class="price-col"></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr class="combo-row"><td colspan="2"><b>Dinner For Six - $98.99</b> <div class="item-control" data-id="D6" data-price="98.99" data-name="Dinner For Six"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Egg roll (6)</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Sweet and sour chicken ball</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Lemon chicken</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Breaded shrimp</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Beef with broccoli</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Tai dop voy</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken chop suey</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken fried rice (L)</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Fortune Cookies (6)</td><td class="price-col"></td></tr>
+                
+            </tbody>
+        </table>
+    </div>
+
+    <div id="pickup-specials" class="category-section">
+        <h2 class="category-title">Pick-up Specials</h2>
+        <table>
+            <tbody>
+                <tr class="combo-row"><td colspan="2"><b>Special Dinner For Four - $55.99</b> <div class="item-control" data-id="PS4" data-price="55.99" data-name="Special Dinner For Four"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Egg roll (4)</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Sweet and sour chicken balls</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken chop suey</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Mixed Vegetables Lo Mein</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Beef with Mixed Vegetables</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">BBQ Pork Fried Rice</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Fortune cookies (4)</td><td class="price-col"></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="optional-dinners" class="category-section">
+        <h2 class="category-title">Optional Family Dinners</h2>
+        <table>
+            <tbody>
+                <tr class="combo-row"><td colspan="2"><b>Optional Dinner for Two - $44.99</b> <div class="item-control" data-id="OD2" data-price="44.99" data-name="Optional Dinner for Two"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">2 Egg Rolls or Spring Rolls</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Any 2 dishes from items No. 001 - 200</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken Fried Rice</td><td class="price-col"></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr class="combo-row"><td colspan="2"><b>Optional Dinner for Three - $62.99</b> <div class="item-control" data-id="OD3" data-price="62.99" data-name="Optional Dinner for Three"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">3 Egg Rolls or Spring Rolls</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Any 3 dishes from items No. 001 - 200</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken Fried Rice</td><td class="price-col"></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr class="combo-row"><td colspan="2"><b>Optional Dinner for Four - $79.99</b> <div class="item-control" data-id="OD4" data-price="79.99" data-name="Optional Dinner for Four"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">4 Egg Rolls or Spring Rolls</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Any 4 dishes from items No. 001 - 200</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken Fried Rice</td><td class="price-col"></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr class="combo-row"><td colspan="2"><b>Optional Dinner for Five - $96.99</b> <div class="item-control" data-id="OD5" data-price="96.99" data-name="Optional Dinner for Five"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">5 Egg Rolls or Spring Rolls</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Any 5 dishes from items No. 001 - 200</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken Fried Rice (L)</td><td class="price-col"></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr class="combo-row"><td colspan="2"><b>Optional Dinner for Six - $113.99</b> <div class="item-control" data-id="OD6" data-price="113.99" data-name="Optional Dinner for Six"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">6 Egg Rolls or Spring Rolls</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Any 6 dishes from items No. 001 - 200</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken Fried Rice (L)</td><td class="price-col"></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="combo-one" class="category-section">
+        <h2 class="category-title">Combination Dinner for One</h2>
+        <table>
+            <tbody>
+                <tr class="combo-row"><td colspan="2"><b>C1 - $14.50</b> <div class="item-control" data-id="C1" data-price="14.50" data-name="C1 Combination Dinner for One"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Egg roll</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Sweet and sour chicken balls</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken chop suey</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken fried rice</td><td class="price-col"></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr class="combo-row"><td colspan="2"><b>C2 - $14.50</b> <div class="item-control" data-id="C2" data-price="14.50" data-name="C2 Combination Dinner for One"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Egg Roll</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Sweet & Sour Spareribs</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken Chop Suey</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken Lo Mein</td><td class="price-col"></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr class="combo-row"><td colspan="2"><b>C3 - $14.50</b> <div class="item-control" data-id="C3" data-price="14.50" data-name="C3 Combination Dinner for One"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Egg Roll</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Sweet & Sour Pork</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken Chop Suey</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Beef Fried Rice</td><td class="price-col"></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr class="combo-row"><td colspan="2"><b>C4 - $14.50</b> <div class="item-control" data-id="C4" data-price="14.50" data-name="C4 Combination Dinner for One"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Egg roll</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">General Tso's chicken</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken chop suey</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Beef fried rice</td><td class="price-col"></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr class="combo-row"><td colspan="2"><b>C5 - $14.50</b> <div class="item-control" data-id="C5" data-price="14.50" data-name="C5 Combination Dinner for One"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Spring Roll</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken Wings</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Chicken Chop Suey</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Veggie Lo Mein</td><td class="price-col"></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr class="combo-row"><td colspan="2"><b>C6 - $14.50</b> <div class="item-control" data-id="C6" data-price="14.50" data-name="C6 Combination Dinner for One"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Spring Roll</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Stir Fried Mixed Veggie</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Veggie Chop Suey</td><td class="price-col"></td></tr>
+                <tr><td class="item-name-indent">Veggie Fried Rice</td><td class="price-col"></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="appetizer" class="category-section">
+        <h2 class="category-title">Appetizer</h2>
+        <table>
+            <tbody>
+                <tr><td>001. Egg Roll</td><td class="price-col">$2.20 <div class="item-control" data-id="001" data-price="2.20" data-name="Egg Roll"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>002. Spring Roll</td><td class="price-col">$2.40 <div class="item-control" data-id="002" data-price="2.40" data-name="Spring Roll"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>003. French Fries</td><td class="price-col">$6.65 <div class="item-control" data-id="003" data-price="6.65" data-name="French Fries"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>004. Crispy Chicken Wings w/Salted Pepper</td><td class="price-col">$15.50 <div class="item-control" data-id="004" data-price="15.50" data-name="Crispy Chicken Wings w/Salted Pepper"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>005. Deep Fried Crispy Wonton (12 Pieces)</td><td class="price-col">$13.25 <div class="item-control" data-id="005" data-price="13.25" data-name="Deep Fried Crispy Wonton (12 Pieces)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>006. Deep Fried Crab Meat Cheese Wonton (12 Pieces)</td><td class="price-col">$14.25 <div class="item-control" data-id="006" data-price="14.25" data-name="Deep Fried Crab Meat Cheese Wonton (12 Pieces)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>007. Crispy Chicken Wings</td><td class="price-col">$14.25 <div class="item-control" data-id="007" data-price="14.25" data-name="Crispy Chicken Wings"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>008. Hot & Spicy Buffalo Chicken Wings</td><td class="price-col">$15.50 <div class="item-control" data-id="008" data-price="15.50" data-name="Hot & Spicy Buffalo Chicken Wings"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>009. Honey Garlic Chicken Wings</td><td class="price-col">$15.50 <div class="item-control" data-id="009" data-price="15.50" data-name="Honey Garlic Chicken Wings"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>010. Breaded Shrimp</td><td class="price-col">$15.50 <div class="item-control" data-id="010" data-price="15.50" data-name="Breaded Shrimp"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>011. BBQ Pork Slices</td><td class="price-col">$15.50 <div class="item-control" data-id="011" data-price="15.50" data-name="BBQ Pork Slices"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>012. BBQ Spareribs</td><td class="price-col">$16.55 <div class="item-control" data-id="012" data-price="16.55" data-name="BBQ Spareribs"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="dim-sum" class="category-section">
+        <h2 class="category-title">Dim Sum</h2>
+        <table>
+            <tbody>
+                <tr><td>018. Sui Mai (Pork)(4)</td><td class="price-col">$6.85 <div class="item-control" data-id="018" data-price="6.85" data-name="Sui Mai (Pork)(4)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>019. Shrimp Dumpling (Har Gao)(4)</td><td class="price-col">$6.85 <div class="item-control" data-id="019" data-price="6.85" data-name="Shrimp Dumpling (Har Gao)(4)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>020. BBQ Pork Bun (3)</td><td class="price-col">$6.85 <div class="item-control" data-id="020" data-price="6.85" data-name="BBQ Pork Bun (3)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>021. Pan Fried Pork Dumpling (6)</td><td class="price-col">$10.25 <div class="item-control" data-id="021" data-price="10.25" data-name="Pan Fried Pork Dumpling (6)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="soup" class="category-section">
+        <h2 class="category-title">Soup</h2>
+        <table>
+            <tbody>
+                <tr><td colspan="2"><b>027. Wonton Soup with BBQ Pork/Chicken/Beef</b></td></tr>
+                <tr><td class="item-name-indent">Small</td><td class="price-col">$6.00 <div class="item-control" data-id="027S" data-price="6.00" data-name="Wonton Soup (Small)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Large</td><td class="price-col">$10.50 <div class="item-control" data-id="027L" data-price="10.50" data-name="Wonton Soup (Large)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr><td colspan="2"><b>028. Chicken Corn Soup</b></td></tr>
+                <tr><td class="item-name-indent">Small</td><td class="price-col">$6.00 <div class="item-control" data-id="028S" data-price="6.00" data-name="Chicken Corn Soup (Small)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Large</td><td class="price-col">$10.50 <div class="item-control" data-id="028L" data-price="10.50" data-name="Chicken Corn Soup (Large)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr><td colspan="2"><b>029. Chicken Noodle / Rice Soup</b></td></tr>
+                <tr><td class="item-name-indent">Small</td><td class="price-col">$6.00 <div class="item-control" data-id="029S" data-price="6.00" data-name="Chicken Noodle/Rice Soup (Small)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Large</td><td class="price-col">$10.50 <div class="item-control" data-id="029L" data-price="10.50" data-name="Chicken Noodle/Rice Soup (Large)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr><td colspan="2"><b>030. Mushroom with Egg Drop Soup</b></td></tr>
+                <tr><td class="item-name-indent">Small</td><td class="price-col">$6.00 <div class="item-control" data-id="030S" data-price="6.00" data-name="Mushroom Egg Drop Soup (Small)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Large</td><td class="price-col">$10.50 <div class="item-control" data-id="030L" data-price="10.50" data-name="Mushroom Egg Drop Soup (Large)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr><td colspan="2"><b>031. Hot and Sour Soup (Pork or Veggi)</b></td></tr>
+                <tr><td class="item-name-indent">Small</td><td class="price-col">$7.50 <div class="item-control" data-id="031S" data-price="7.50" data-name="Hot and Sour Soup (Small)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Large</td><td class="price-col">$12.95 <div class="item-control" data-id="031L" data-price="12.95" data-name="Hot and Sour Soup (Large)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td colspan="2">&nbsp;</td></tr>
+
+                <tr><td colspan="2"><b>032. Seafood Tofu Soup</b></td></tr>
+                <tr><td class="item-name-indent">Small</td><td class="price-col">$9.60 <div class="item-control" data-id="032S" data-price="9.60" data-name="Seafood Tofu Soup (Small)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">Large</td><td class="price-col">$13.80 <div class="item-control" data-id="032L" data-price="13.80" data-name="Seafood Tofu Soup (Large)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="sweet-sour" class="category-section">
+        <h2 class="category-title">Sweet & Sour</h2>
+        <table>
+            <tbody>
+                <tr><td>038. Sweet & Sour Chicken Balls</td><td class="price-col">$15.75 <div class="item-control" data-id="038" data-price="15.75" data-name="Sweet & Sour Chicken Balls"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>039. Sweet & Sour Pork with Pineapple</td><td class="price-col">$14.25 <div class="item-control" data-id="039" data-price="14.25" data-name="Sweet & Sour Pork with Pineapple"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>040. Sweet & Sour Chicken with Pineapple</td><td class="price-col">$14.25 <div class="item-control" data-id="040" data-price="14.25" data-name="Sweet & Sour Chicken with Pineapple"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>041. Sweet & Sour Spareribs with Tomato</td><td class="price-col">$14.25 <div class="item-control" data-id="041" data-price="14.25" data-name="Sweet & Sour Spareribs with Tomato"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>042. Sweet & Sour Platter</td><td class="price-col">$21.80 <div class="item-control" data-id="042" data-price="21.80" data-name="Sweet & Sour Platter"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">(4 chickenballs 4 Breaded Shrimps 4 Cheese wontons 4 BBQ spareribs)</td><td class="price-col"></td></tr>
+                <tr><td>043. Sweet & Sour Sauce</td><td class="price-col">$3.60 <div class="item-control" data-id="043" data-price="3.60" data-name="Sweet & Sour Sauce"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>044. Sweet & Sour Crispy Wonton Chips</td><td class="price-col">$8.25 <div class="item-control" data-id="044" data-price="8.25" data-name="Sweet & Sour Crispy Wonton Chips"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>045. Sweet & Sour Crispy Wonton</td><td class="price-col">$14.25 <div class="item-control" data-id="045" data-price="14.25" data-name="Sweet & Sour Crispy Wonton"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>046. Sweet & Sour Shrimps</td><td class="price-col">$16.55 <div class="item-control" data-id="046" data-price="16.55" data-name="Sweet & Sour Shrimps"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="chop-suey" class="category-section">
+        <h2 class="category-title">Chop Suey / Chow Mein</h2>
+        <table>
+            <tbody>
+                <tr><td>(Bean Sprouts / Chow Mein with Dry Noodles)</td><td class="price-col"></td></tr>
+                <tr><td>049. Chicken Chop Suey</td><td class="price-col">$10.75 <div class="item-control" data-id="049C" data-price="10.75" data-name="Chicken Chop Suey"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>049. Beef Chop Suey</td><td class="price-col">$10.75 <div class="item-control" data-id="049B" data-price="10.75" data-name="Beef Chop Suey"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>049. BBQ Pork Chop Suey</td><td class="price-col">$10.75 <div class="item-control" data-id="049P" data-price="10.75" data-name="BBQ Pork Chop Suey"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>050. Vegetables Chop Suey</td><td class="price-col">$10.75 <div class="item-control" data-id="050" data-price="10.75" data-name="Vegetables Chop Suey"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>051. Shrimp Chop Suey</td><td class="price-col">$12.45 <div class="item-control" data-id="051" data-price="12.45" data-name="Shrimp Chop Suey"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>052. House Special Chop Suey</td><td class="price-col">$13.25 <div class="item-control" data-id="052" data-price="13.25" data-name="House Special Chop Suey"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="chicken" class="category-section">
+        <h2 class="category-title">Chicken</h2>
+        <table>
+            <tbody>
+                <tr><td>058. Lemon Chicken</td><td class="price-col">$15.75 <div class="item-control" data-id="058" data-price="15.75" data-name="Lemon Chicken"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>059. Almond Soo Gai</td><td class="price-col">$16.75 <div class="item-control" data-id="059" data-price="16.75" data-name="Almond Soo Gai"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>060. Orange Chicken</td><td class="price-col">$15.25 <div class="item-control" data-id="060" data-price="15.25" data-name="Orange Chicken"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>061. Sesame Chicken</td><td class="price-col">$15.25 <div class="item-control" data-id="061" data-price="15.25" data-name="Sesame Chicken"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>062. General Tso’s Chicken</td><td class="price-col">$15.25 <div class="item-control" data-id="062" data-price="15.25" data-name="General Tso’s Chicken"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>063. Szechuan Chicken</td><td class="price-col">$14.25 <div class="item-control" data-id="063" data-price="14.25" data-name="Szechuan Chicken"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>064. Curry Chicken</td><td class="price-col">$14.25 <div class="item-control" data-id="064" data-price="14.25" data-name="Curry Chicken"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>065. Kung Po Chicken with peanuts</td><td class="price-col">$14.25 <div class="item-control" data-id="065" data-price="14.25" data-name="Kung Po Chicken with peanuts"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>066. Satay Chicken</td><td class="price-col">$14.25 <div class="item-control" data-id="066" data-price="14.25" data-name="Satay Chicken"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>067. Chicken with Mixed Vegetables</td><td class="price-col">$14.25 <div class="item-control" data-id="067" data-price="14.25" data-name="Chicken with Mixed Vegetables"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>068. Chicken with Mixed Vegetables and Almonds Or Cashew Nuts</td><td class="price-col">$15.50 <div class="item-control" data-id="068" data-price="15.50" data-name="Chicken with Mixed Vegetables and Almonds Or Cashew Nuts"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>069. Chicken with Broccoli</td><td class="price-col">$14.25 <div class="item-control" data-id="069" data-price="14.25" data-name="Chicken with Broccoli"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>070. Chicken with Mushroom (Moo Goo Gai Pan)</td><td class="price-col">$14.25 <div class="item-control" data-id="070" data-price="14.25" data-name="Chicken with Mushroom (Moo Goo Gai Pan)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>071. Chicken with Black Bean Sauce</td><td class="price-col">$14.25 <div class="item-control" data-id="071" data-price="14.25" data-name="Chicken with Black Bean Sauce"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>072. Chicken with Snow Peas (in Season)</td><td class="price-col">$16.00 <div class="item-control" data-id="072" data-price="16.00" data-name="Chicken with Snow Peas (in Season)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>073. Tai Dop Voy</td><td class="price-col">$16.55 <div class="item-control" data-id="073" data-price="16.55" data-name="Tai Dop Voy"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>074. Black Pepper Chicken</td><td class="price-col">$14.25 <div class="item-control" data-id="074" data-price="14.25" data-name="Black Pepper Chicken"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>075. Chilli Chicken (Gravy or Dry)</td><td class="price-col">$15.50 <div class="item-control" data-id="075" data-price="15.50" data-name="Chilli Chicken (Gravy or Dry)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>076. Honey Garlic Chicken</td><td class="price-col">$15.50 <div class="item-control" data-id="076" data-price="15.50" data-name="Honey Garlic Chicken"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="beef" class="category-section">
+        <h2 class="category-title">Beef</h2>
+        <table>
+            <tbody>
+                <tr><td>079. Honey Garlic Crispy Beef</td><td class="price-col">$17.95 <div class="item-control" data-id="079" data-price="17.95" data-name="Honey Garlic Crispy Beef"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>080. Beef with Broccoli</td><td class="price-col">$14.75 <div class="item-control" data-id="080" data-price="14.75" data-name="Beef with Broccoli"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>081. Beef with Black Bean Sauce</td><td class="price-col">$14.75 <div class="item-control" data-id="081" data-price="14.75" data-name="Beef with Black Bean Sauce"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>082. Beef with Mixed Vegetables</td><td class="price-col">$14.75 <div class="item-control" data-id="082" data-price="14.75" data-name="Beef with Mixed Vegetables"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>083. Beef with Mixed Vegetables and Almonds Or Cashew Nuts</td><td class="price-col">$15.95 <div class="item-control" data-id="083" data-price="15.95" data-name="Beef with Mixed Vegetables and Almonds Or Cashew Nuts"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>084. Beef with Ginger and Green Onion</td><td class="price-col">$14.75 <div class="item-control" data-id="084" data-price="14.75" data-name="Beef with Ginger and Green Onion"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>085. Beef with Mushroom</td><td class="price-col">$14.75 <div class="item-control" data-id="085" data-price="14.75" data-name="Beef with Mushroom"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>086. Satay Beef</td><td class="price-col">$14.75 <div class="item-control" data-id="086" data-price="14.75" data-name="Satay Beef"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>087. Curry Beef</td><td class="price-col">$14.75 <div class="item-control" data-id="087" data-price="14.75" data-name="Curry Beef"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>088. Szechuan Beef</td><td class="price-col">$14.75 <div class="item-control" data-id="088" data-price="14.75" data-name="Szechuan Beef"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>089. Black Pepper Beef</td><td class="price-col">$14.75 <div class="item-control" data-id="089" data-price="14.75" data-name="Black Pepper Beef"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>090. Orange Beef</td><td class="price-col">$17.95 <div class="item-control" data-id="090" data-price="17.95" data-name="Orange Beef"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>091. Sam See with Bean Sprout</td><td class="price-col">$14.75 <div class="item-control" data-id="091" data-price="14.75" data-name="Sam See with Bean Sprout"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">(shredded chicken and beef and BBQ pork with bean sprouts)</td><td class="price-col"></td></tr>
+                <tr><td>092. Beef with Snow Peas (in Season)</td><td class="price-col">$16.75 <div class="item-control" data-id="092" data-price="16.75" data-name="Beef with Snow Peas (in Season)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="pork" class="category-section">
+        <h2 class="category-title">Pork</h2>
+        <table>
+            <tbody>
+                <tr><td>100. BBQ Pork with Broccoli</td><td class="price-col">$14.25 <div class="item-control" data-id="100" data-price="14.25" data-name="BBQ Pork with Broccoli"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>101. BBQ Pork with Mixed Vegetables</td><td class="price-col">$14.25 <div class="item-control" data-id="101" data-price="14.25" data-name="BBQ Pork with Mixed Vegetables"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>102. BBQ Pork with Mixed Vegetables and Almonds Or Cashew Nuts</td><td class="price-col">$15.50 <div class="item-control" data-id="102" data-price="15.50" data-name="BBQ Pork with Mixed Vegetables and Almonds Or Cashew Nuts"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>103. BBQ Pork with Snow Peas (in Season)</td><td class="price-col">$16.00 <div class="item-control" data-id="103" data-price="16.00" data-name="BBQ Pork with Snow Peas (in Season)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>105. Pork Chop with Salted Pepper</td><td class="price-col">$17.60 <div class="item-control" data-id="105" data-price="17.60" data-name="Pork Chop with Salted Pepper"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>107. Honey Garlic Spareribs</td><td class="price-col">$16.00 <div class="item-control" data-id="107" data-price="16.00" data-name="Honey Garlic Spareribs"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>108. Honey Garlic Sauce</td><td class="price-col">$3.60 <div class="item-control" data-id="108" data-price="3.60" data-name="Honey Garlic Sauce"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="seafood" class="category-section">
+        <h2 class="category-title">Seafood</h2>
+        <table>
+            <tbody>
+                <tr><td>113. Shrimp with Black Bean Sauce</td><td class="price-col">$15.50 <div class="item-control" data-id="113" data-price="15.50" data-name="Shrimp with Black Bean Sauce"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>114. Shrimp with Lobster Sauce</td><td class="price-col">$15.50 <div class="item-control" data-id="114" data-price="15.50" data-name="Shrimp with Lobster Sauce"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>115. Shrimp with Broccoli</td><td class="price-col">$15.50 <div class="item-control" data-id="115" data-price="15.50" data-name="Shrimp with Broccoli"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>116. Shrimp with Mixed Vegetables</td><td class="price-col">$15.50 <div class="item-control" data-id="116" data-price="15.50" data-name="Shrimp with Mixed Vegetables"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>117. Shrimp with Mixed Vegetables and Almonds Or Cashew Nuts</td><td class="price-col">$16.55 <div class="item-control" data-id="117" data-price="16.55" data-name="Shrimp with Mixed Vegetables and Almonds Or Cashew Nuts"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>118. Shrimp with Mushroom</td><td class="price-col">$15.50 <div class="item-control" data-id="118" data-price="15.50" data-name="Shrimp with Mushroom"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>119. Shrimp with Snow Peas (in Season)</td><td class="price-col">$17.00 <div class="item-control" data-id="119" data-price="17.00" data-name="Shrimp with Snow Peas (in Season)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>121. Curry Squid</td><td class="price-col">$16.55 <div class="item-control" data-id="121" data-price="16.55" data-name="Curry Squid"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>123. Squid with Black Bean Sauce</td><td class="price-col">$16.55 <div class="item-control" data-id="123" data-price="16.55" data-name="Squid with Black Bean Sauce"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>124. Szechuan Shrimp</td><td class="price-col">$16.55 <div class="item-control" data-id="124" data-price="16.55" data-name="Szechuan Shrimp"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>125. Curry Shrimp</td><td class="price-col">$16.55 <div class="item-control" data-id="125" data-price="16.55" data-name="Curry Shrimp"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="egg-foo-young" class="category-section">
+        <h2 class="category-title">Egg Foo Young</h2>
+        <table>
+            <tbody>
+                <tr><td>130. Chicken Egg Foo Yung</td><td class="price-col">$14.55 <div class="item-control" data-id="130C" data-price="14.55" data-name="Chicken Egg Foo Yung"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>130. Beef Egg Foo Yung</td><td class="price-col">$14.55 <div class="item-control" data-id="130B" data-price="14.55" data-name="Beef Egg Foo Yung"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>130. BBQ Pork Egg Foo Yung</td><td class="price-col">$14.55 <div class="item-control" data-id="130P" data-price="14.55" data-name="BBQ Pork Egg Foo Yung"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>131. Mushroom Egg Foo Yung</td><td class="price-col">$14.55 <div class="item-control" data-id="131M" data-price="14.55" data-name="Mushroom Egg Foo Yung"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>131. Vegetables Egg Foo Yung</td><td class="price-col">$14.55 <div class="item-control" data-id="131V" data-price="14.55" data-name="Vegetables Egg Foo Yung"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>132. Shrimp Egg Foo Yung</td><td class="price-col">$15.55 <div class="item-control" data-id="132" data-price="15.55" data-name="Shrimp Egg Foo Yung"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>133. House Special Egg Foo Yung</td><td class="price-col">$16.55 <div class="item-control" data-id="133" data-price="16.55" data-name="House Special Egg Foo Yung"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="vegetables" class="category-section">
+        <h2 class="category-title">Vegetables and Bean Curd (Tofu)</h2>
+        <table>
+            <tbody>
+                <tr><td>139. Stir Fried (or Steamed) Broccoli</td><td class="price-col">$11.15 <div class="item-control" data-id="139" data-price="11.15" data-name="Stir Fried (or Steamed) Broccoli"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>140. Stir Fried Bak Choy</td><td class="price-col">$11.15 <div class="item-control" data-id="140" data-price="11.15" data-name="Stir Fried Bak Choy"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>141. Stir Fried (or Steamed) Mixed Vegetables</td><td class="price-col">$11.15 <div class="item-control" data-id="141" data-price="11.15" data-name="Stir Fried (or Steamed) Mixed Vegetables"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>142. Mixed Vegetables & Almonds Or Cashew Nuts</td><td class="price-col">$12.65 <div class="item-control" data-id="142" data-price="12.65" data-name="Mixed Vegetables & Almonds Or Cashew Nuts"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>143. Braised Deep Fried Bean Curd</td><td class="price-col">$12.65 <div class="item-control" data-id="143" data-price="12.65" data-name="Braised Deep Fried Bean Curd"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>144. Ma-Po Tofu (Bean Curd with Pork)</td><td class="price-col">$12.65 <div class="item-control" data-id="144" data-price="12.65" data-name="Ma-Po Tofu (Bean Curd with Pork)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="fried-rice" class="category-section">
+        <h2 class="category-title">Fried Rice</h2>
+        <table>
+            <tbody>
+                <tr><td>150. Chicken Fried Rice</td><td class="price-col">$10.50 <div class="item-control" data-id="150C" data-price="10.50" data-name="Chicken Fried Rice"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>150. Beef Fried Rice</td><td class="price-col">$10.50 <div class="item-control" data-id="150B" data-price="10.50" data-name="Beef Fried Rice"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>150. BBQ Pork Fried Rice</td><td class="price-col">$10.50 <div class="item-control" data-id="150P" data-price="10.50" data-name="BBQ Pork Fried Rice"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>151. Mixed Vegetables Fried Rice</td><td class="price-col">$10.50 <div class="item-control" data-id="151V" data-price="10.50" data-name="Mixed Vegetables Fried Rice"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>151. Mushroom Fried Rice</td><td class="price-col">$10.50 <div class="item-control" data-id="151M" data-price="10.50" data-name="Mushroom Fried Rice"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>152. Shrimp Fried Rice</td><td class="price-col">$12.15 <div class="item-control" data-id="152" data-price="12.15" data-name="Shrimp Fried Rice"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>153. Yung Chow Fried Rice</td><td class="price-col">$12.65 <div class="item-control" data-id="153" data-price="12.65" data-name="Yung Chow Fried Rice"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>154. Curry Chicken Fried Rice</td><td class="price-col">$12.65 <div class="item-control" data-id="154C" data-price="12.65" data-name="Curry Chicken Fried Rice"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>154. Curry Beef Fried Rice</td><td class="price-col">$12.65 <div class="item-control" data-id="154B" data-price="12.65" data-name="Curry Beef Fried Rice"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>155. Curry Vegetables Fried Rice</td><td class="price-col">$12.65 <div class="item-control" data-id="155" data-price="12.65" data-name="Curry Vegetables Fried Rice"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>156. Curry Shrimp Fried Rice</td><td class="price-col">$13.25 <div class="item-control" data-id="156" data-price="13.25" data-name="Curry Shrimp Fried Rice"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>157. House Special Fried Rice (L)</td><td class="price-col">$13.25 <div class="item-control" data-id="157" data-price="13.25" data-name="House Special Fried Rice (L)"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>158. Plain Fried Rice</td><td class="price-col">$9.50 <div class="item-control" data-id="158" data-price="9.50" data-name="Plain Fried Rice"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>159. Steamed Rice</td><td class="price-col">$4.15 <div class="item-control" data-id="159" data-price="4.15" data-name="Steamed Rice"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="noodles" class="category-section">
+        <h2 class="category-title">Noodles</h2>
+        <table>
+            <tbody>
+                <tr><td>(Cantonese style Chow Mein is the Fried egg noodle)</td><td class="price-col"></td></tr>
+                <tr><td>165. Cantonese Chow Mein (with Chicken, Beef, Pork, Shrimp, Veggi)</td><td class="price-col">$15.75 <div class="item-control" data-id="165" data-price="15.75" data-name="Cantonese Chow Mein"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>166. Cantonese Chicken Chow Mein</td><td class="price-col">$14.75 <div class="item-control" data-id="166C" data-price="14.75" data-name="Cantonese Chicken Chow Mein"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>166. Cantonese Beef Chow Mein</td><td class="price-col">$14.75 <div class="item-control" data-id="166B" data-price="14.75" data-name="Cantonese Beef Chow Mein"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>166. Cantonese Shrimp Chow Mein</td><td class="price-col">$14.75 <div class="item-control" data-id="166S" data-price="14.75" data-name="Cantonese Shrimp Chow Mein"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>166. Cantonese BBQ Pork Chow Mein</td><td class="price-col">$14.75 <div class="item-control" data-id="166P" data-price="14.75" data-name="Cantonese BBQ Pork Chow Mein"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>167. Cantonese Shrimp Chow Mein</td><td class="price-col">$15.75 <div class="item-control" data-id="167" data-price="15.75" data-name="Cantonese Shrimp Chow Mein"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>168. Cantonese Vegetables Chow Mein</td><td class="price-col">$14.75 <div class="item-control" data-id="168" data-price="14.75" data-name="Cantonese Vegetables Chow Mein"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>169. Bean Sprout Fried Noodle with Soya Sauce</td><td class="price-col">$15.75 <div class="item-control" data-id="169" data-price="15.75" data-name="Bean Sprout Fried Noodle with Soya Sauce"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>171. Beef Fried Rice Noodle</td><td class="price-col">$15.95 <div class="item-control" data-id="171B" data-price="15.95" data-name="Beef Fried Rice Noodle"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>171. Chicken Fried Rice Noodle</td><td class="price-col">$15.95 <div class="item-control" data-id="171C" data-price="15.95" data-name="Chicken Fried Rice Noodle"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>172. Beef with Black Bean Sauce Fried Rice Noodle</td><td class="price-col">$15.95 <div class="item-control" data-id="172" data-price="15.95" data-name="Beef with Black Bean Sauce Fried Rice Noodle"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>173. Singapore Spicy Fried Vermicelli (with Pork and Shrimp)</td><td class="price-col">$15.75 <div class="item-control" data-id="173" data-price="15.75" data-name="Singapore Spicy Fried Vermicelli"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>174. House Special Fried Vermicelli (with Pork and Shrimp)</td><td class="price-col">$15.75 <div class="item-control" data-id="174" data-price="15.75" data-name="House Special Fried Vermicelli"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="pad-thai" class="category-section">
+        <h2 class="category-title">Pad Thai Noodles</h2>
+        <table>
+            <tbody>
+                <tr><td>180. Chicken Pad Thai</td><td class="price-col">$14.50 <div class="item-control" data-id="180C" data-price="14.50" data-name="Chicken Pad Thai"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>180. Beef Pad Thai</td><td class="price-col">$14.50 <div class="item-control" data-id="180B" data-price="14.50" data-name="Beef Pad Thai"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>180. BBQ Pork Pad Thai</td><td class="price-col">$14.50 <div class="item-control" data-id="180P" data-price="14.50" data-name="BBQ Pork Pad Thai"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>181. Shrimp Pad Thai</td><td class="price-col">$15.50 <div class="item-control" data-id="181" data-price="15.50" data-name="Shrimp Pad Thai"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>182. Vegetables Pad Thai</td><td class="price-col">$13.25 <div class="item-control" data-id="182" data-price="13.25" data-name="Vegetables Pad Thai"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>183. House Special Pad Thai (with Chicken, Beef, Pork, Shrimp)</td><td class="price-col">$15.50 <div class="item-control" data-id="183" data-price="15.50" data-name="House Special Pad Thai"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="shanghai-noodles" class="category-section">
+        <h2 class="category-title">Shanghai Noodles</h2>
+        <table>
+            <tbody>
+                <tr><td>189. Chicken Shanghai Noodle</td><td class="price-col">$14.50 <div class="item-control" data-id="189C" data-price="14.50" data-name="Chicken Shanghai Noodle"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>189. Beef Shanghai Noodle</td><td class="price-col">$14.50 <div class="item-control" data-id="189B" data-price="14.50" data-name="Beef Shanghai Noodle"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>189. BBQ Pork Shanghai Noodle</td><td class="price-col">$14.50 <div class="item-control" data-id="189P" data-price="14.50" data-name="BBQ Pork Shanghai Noodle"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>190. Vegetables Shanghai Noodle</td><td class="price-col">$13.25 <div class="item-control" data-id="190" data-price="13.25" data-name="Vegetables Shanghai Noodle"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>191. Shrimp Shanghai Noodle</td><td class="price-col">$15.50 <div class="item-control" data-id="191" data-price="15.50" data-name="Shrimp Shanghai Noodle"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>192. House Special Shanghai Noodle (with Chicken, Beef, Pork, Shrimp)</td><td class="price-col">$15.50 <div class="item-control" data-id="192" data-price="15.50" data-name="House Special Shanghai Noodle"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="lo-mein" class="category-section">
+        <h2 class="category-title">Lo Mein</h2>
+        <table>
+            <tbody>
+                <tr><td>194. Cantonese Lo Mein (with Chicken, Beef, Pork, Shrimp, Veggi)</td><td class="price-col">$15.75 <div class="item-control" data-id="194" data-price="15.75" data-name="Cantonese Lo Mein"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>195. Chicken Lo Mein</td><td class="price-col">$14.75 <div class="item-control" data-id="195C" data-price="14.75" data-name="Chicken Lo Mein"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>195. Beef Lo Mein</td><td class="price-col">$14.75 <div class="item-control" data-id="195B" data-price="14.75" data-name="Beef Lo Mein"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>195. BBQ Pork Lo Mein</td><td class="price-col">$14.75 <div class="item-control" data-id="195P" data-price="14.75" data-name="BBQ Pork Lo Mein"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>196. Shrimp Lo Mein</td><td class="price-col">$15.75 <div class="item-control" data-id="196" data-price="15.75" data-name="Shrimp Lo Mein"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>197. Vegetables Lo Mein</td><td class="price-col">$14.75 <div class="item-control" data-id="197" data-price="14.75" data-name="Vegetables Lo Mein"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>198. Plain Lo Mein</td><td class="price-col">$9.85 <div class="item-control" data-id="198" data-price="9.85" data-name="Plain Lo Mein"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>199. Szechuan Lo Mein (with Chicken, Shrimp and Veggi)</td><td class="price-col">$15.75 <div class="item-control" data-id="199" data-price="15.75" data-name="Szechuan Lo Mein"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>200. Curry Chicken Lo Mein</td><td class="price-col">$15.75 <div class="item-control" data-id="200C" data-price="15.75" data-name="Curry Chicken Lo Mein"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>200. Curry Beef Lo Mein</td><td class="price-col">$15.75 <div class="item-control" data-id="200B" data-price="15.75" data-name="Curry Beef Lo Mein"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="chef-special" class="category-section">
+        <h2 class="category-title">Chef's Special</h2>
+        <table>
+            <tbody>
+                <tr><td>S01. Seafood Tai Dop Voy</td><td class="price-col">$23.00 <div class="item-control" data-id="S01" data-price="23.00" data-name="Seafood Tai Dop Voy"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">(Scallops shrimps and squid with Fresh Garden Vegetables)</td><td class="price-col"></td></tr>
+                <tr><td>S02. Seafood Chow Mein</td><td class="price-col">$23.00 <div class="item-control" data-id="S02" data-price="23.00" data-name="Seafood Chow Mein"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">(Scallops shrimps and squid with fried fine egg noodle)</td><td class="price-col"></td></tr>
+                <tr><td>S03. Szechuan Seafood</td><td class="price-col">$23.00 <div class="item-control" data-id="S03" data-price="23.00" data-name="Szechuan Seafood"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td class="item-name-indent">(Scallops shrimps and squid with hot & spicy sauce)</td><td class="price-col"></td></tr>
+                <tr><td>S04. Shrimp with Salted Pepper</td><td class="price-col">$23.00 <div class="item-control" data-id="S04" data-price="23.00" data-name="Shrimp with Salted Pepper"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>S05. Eggplant with Minced Pork</td><td class="price-col">$15.55 <div class="item-control" data-id="S05" data-price="15.55" data-name="Eggplant with Minced Pork"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>S07. Seafood with Deep Fried Bean Curd</td><td class="price-col">$18.75 <div class="item-control" data-id="S07" data-price="18.75" data-name="Seafood with Deep Fried Bean Curd"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>S08. Shrimp with Scrambled Egg</td><td class="price-col">$15.55 <div class="item-control" data-id="S08" data-price="15.55" data-name="Shrimp with Scrambled Egg"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>S09. Squid with Salted Pepper</td><td class="price-col">$17.95 <div class="item-control" data-id="S09" data-price="17.95" data-name="Squid with Salted Pepper"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>S10. Shell Shrimp with Salted Pepper</td><td class="price-col">$17.95 <div class="item-control" data-id="S10" data-price="17.95" data-name="Shell Shrimp with Salted Pepper"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="beverages" class="category-section">
+        <h2 class="category-title">Beverages</h2>
+        <table>
+            <tbody>
+                <tr><td>Coke</td><td class="price-col">$2.10 <div class="item-control" data-id="B01" data-price="2.10" data-name="Coke"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>Diet Coke</td><td class="price-col">$2.10 <div class="item-control" data-id="B02" data-price="2.10" data-name="Diet Coke"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>Pepsi</td><td class="price-col">$2.10 <div class="item-control" data-id="B03" data-price="2.10" data-name="Pepsi"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>Root Beer</td><td class="price-col">$2.10 <div class="item-control" data-id="B04" data-price="2.10" data-name="Root Beer"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>Ginger Ale</td><td class="price-col">$2.10 <div class="item-control" data-id="B05" data-price="2.10" data-name="Ginger Ale"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>Orange Pop</td><td class="price-col">$2.10 <div class="item-control" data-id="B06" data-price="2.10" data-name="Orange Pop"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>Nestle Ice Tea</td><td class="price-col">$2.30 <div class="item-control" data-id="B07" data-price="2.30" data-name="Nestle Ice Tea"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+                <tr><td>Fuze Ice Tea</td><td class="price-col">$2.30 <div class="item-control" data-id="B08" data-price="2.30" data-name="Fuze Ice Tea"><button class="qty-btn minus" onclick="updateQty(this.closest('.item-control').dataset.id, -1)">-</button><span class="qty-display" id="qty-${data-id}">0</span><button class="qty-btn plus" onclick="updateQty(this.closest('.item-control').dataset.id, 1)">+</button></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Toggle cart
+    function toggleCart() {
+        document.getElementById('cartSidebar').classList.toggle('active');
+        document.getElementById('cartOverlay').classList.toggle('active');
+    }
+
+    // Scroll to section
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const element = document.getElementById(targetId);
+            if (element) {
+                const offset = 130;
+                const elementPosition = element.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - offset;
+                window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+            }
+        });
+    });
+</script>
+
+<!-- Cart Sidebar -->
+<div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+        <h3>Your Order</h3>
+        <button class="close-cart" onclick="toggleCart()">
+            <span class="material-icons">close</span>
+        </button>
+    </div>
+    <div class="cart-items" id="cartItems">
+        <p class="cart-empty">Your cart is empty</p>
+    </div>
+    <div class="cart-footer">
+        <div class="cart-summary">
+            <div class="cart-summary-row">
+                <span>Subtotal</span>
+                <span id="subtotal">$0.00</span>
+            </div>
+            <div class="cart-summary-row">
+                <span>Tax (13%)</span>
+                <span id="tax">$0.00</span>
+            </div>
+            <div class="cart-summary-row total">
+                <span>Total</span>
+                <span id="total">$0.00</span>
+            </div>
+        </div>
+        <button class="checkout-btn" onclick="callToOrder()">Call to Order</button>
+    </div>
+</div>
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+
+<!-- Phone Bar -->
+<div class="phone-bar">
+    <div class="phone-bar-info">
+        <div>Items: <span id="bar-items">0</span></div>
+        <div class="phone-bar-total">Total: <span id="bar-total">$0.00</span></div>
+    </div>
+    <button class="phone-btn" onclick="toggleCart()">View Cart</button>
+</div>
+
+
+
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+
+<!-- Footer Info -->
+
+<footer class="footer">
+    <!-- Contact Info (Top) -->
+    <div class="footer-contact-top">
+        <h4>Contact Us</h4>
+        <div class="contact-info">
+            <p>📞 905-778-8828</p>
+            <p>📍 17 Holland St E, Bradford, ON</p>
+        </div>
+    </div>
+    
+    <!-- Business Hours (Bottom) -->
+    <div class="footer-hours-bottom">
+        <h4>Business Hours</h4>
+        <div class="hours-horizontal">
+            <div class="hour-box"><span>Mon</span><span>12PM-9PM</span></div>
+            <div class="hour-box"><span>Tue</span><span class="closed">Closed</span></div>
+            <div class="hour-box"><span>Wed</span><span>12PM-9PM</span></div>
+            <div class="hour-box"><span>Thu</span><span>12PM-9PM</span></div>
+            <div class="hour-box"><span>Fri</span><span>12PM-9PM</span></div>
+            <div class="hour-box"><span>Sat</span><span>12PM-9PM</span></div>
+            <div class="hour-box"><span>Sun</span><span>3PM-9PM</span></div>
+        </div>
+    </div>
+    
+    <div class="footer-bottom">
+        <p>&copy; 2026 Lee's Tasty House. All rights reserved.</p>
+    </div>
+</footer>
+
+
+
+<script>
+    let cart = {};
+    const TAX_RATE = 0.13;
+
+    // Fix quantity display IDs on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.item-control').forEach(control => {
+            const id = control.getAttribute('data-id');
+            const qtyDisplay = control.querySelector('.qty-display');
+            if (qtyDisplay && qtyDisplay.id === 'qty-${data-id}') {
+                qtyDisplay.id = 'qty-' + id;
+            }
+        });
+    });
+
+    // Scroll to section
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const element = document.getElementById(targetId);
+            if (element) {
+                const offset = 130;
+                const elementPosition = element.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - offset;
+                window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+            }
+        });
+    });
+
+    // Update quantity
+    function updateQty(id, delta) {
+        const currentQty = cart[id] || 0;
+        const newQty = currentQty + delta;
+        
+        if (newQty < 0) return;
+        
+        if (newQty === 0) {
+            delete cart[id];
+        } else {
+            cart[id] = newQty;
+        }
+        
+        // Update display
+        const qtyDisplay = document.getElementById('qty-' + id);
+        if (qtyDisplay) {
+            qtyDisplay.textContent = newQty;
+        }
+        
+        updateCart();
+    }
+
+    // Update cart UI
+    function updateCart() {
+        const cartItems = document.getElementById('cartItems');
+        const cartBadge = document.getElementById('cartBadge');
+        const barItems = document.getElementById('bar-items');
+        const barTotal = document.getElementById('bar-total');
+        const subtotalEl = document.getElementById('subtotal');
+        const taxEl = document.getElementById('tax');
+        const totalEl = document.getElementById('total');
+        
+        let itemCount = 0;
+        let subtotal = 0;
+        let html = '';
+        
+        for (let [id, qty] of Object.entries(cart)) {
+            const control = document.querySelector(`.item-control[data-id="${id}"]`);
+            if (!control) continue;
+            
+            const price = parseFloat(control.getAttribute('data-price'));
+            const name = control.getAttribute('data-name');
+            const itemTotal = price * qty;
+            
+            itemCount += qty;
+            subtotal += itemTotal;
+            
+            html += `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${name}</div>
+                        <div class="cart-item-price">$${price.toFixed(2)} x ${qty}</div>
+                    </div>
+                    <span class="cart-item-qty">$${itemTotal.toFixed(2)}</span>
+                    <button class="cart-item-remove" onclick="updateQty('${id}', -${qty})">Remove</button>
+                </div>
+            `;
+        }
+        
+        const tax = subtotal * TAX_RATE;
+        const total = subtotal + tax;
+        
+        // Update displays
+        if (itemCount === 0) {
+            cartItems.innerHTML = '<p class="cart-empty">Your cart is empty</p>';
+        } else {
+            cartItems.innerHTML = html;
+        }
+        
+        cartBadge.textContent = itemCount;
+        barItems.textContent = itemCount;
+        barTotal.textContent = '$' + total.toFixed(2);
+        subtotalEl.textContent = '$' + subtotal.toFixed(2);
+        taxEl.textContent = '$' + tax.toFixed(2);
+        totalEl.textContent = '$' + total.toFixed(2);
+    }
+
+    // Toggle cart
+    function toggleCart() {
+        document.getElementById('cartSidebar').classList.toggle('active');
+        document.getElementById('cartOverlay').classList.toggle('active');
+    }
+
+    // Call to order
+    function callToOrder() {
+        if (Object.keys(cart).length === 0) {
+            alert('Please select at least one item');
+            return;
+        }
+        
+        // Save order to localStorage before calling
+        saveOrderHistory();
+        
+        let orderText = 'Hello, I would like to order:\n\n';
+        let subtotal = 0;
+        
+        for (let [id, qty] of Object.entries(cart)) {
+            const control = document.querySelector(`.item-control[data-id="${id}"]`);
+            if (!control) continue;
+            
+            const price = parseFloat(control.getAttribute('data-price'));
+            const name = control.getAttribute('data-name');
+            orderText += `${id} ${name} x ${qty}\n`;
+            subtotal += price * qty;
+        }
+        
+        const tax = subtotal * TAX_RATE;
+        const total = subtotal + tax;
+        
+        orderText += `\nSubtotal: $${subtotal.toFixed(2)}\nTax (13%): $${tax.toFixed(2)}\nTotal: $${total.toFixed(2)}`;
+        
+        saveOrderHistory();
+        window.location.href = 'tel:9057788828';
+    }
+    
+    // Save order to localStorage
+    function saveOrderHistory() {
+        const orderData = {
+            cart: {...cart},
+            date: new Date().toLocaleString(),
+            total: document.getElementById('total').textContent
+        };
+        localStorage.setItem('lastOrder', JSON.stringify(orderData));
+        loadOrderHistory(); // Refresh display immediately
+    }
+    
+    // Load and display order history
+    function loadOrderHistory() {
+        const historyBtn = document.getElementById('historyBtn');
+        const lastOrder = localStorage.getItem('lastOrder');
+        
+        if (!lastOrder) {
+            historyBtn.style.display = 'none';
+            return;
+        }
+        
+        historyBtn.style.display = 'inline-flex';
+    }
+    
+    // Show last order popup
+    function showLastOrder() {
+        const lastOrder = localStorage.getItem('lastOrder');
+        if (!lastOrder) {
+            alert('No previous order found');
+            return;
+        }
+        
+        const orderData = JSON.parse(lastOrder);
+        tempOrderData = orderData;
+        
+        let itemsText = '';
+        for (let [id, qty] of Object.entries(orderData.cart)) {
+            const control = document.querySelector(`.item-control[data-id="${id}"]`);
+            if (control) {
+                const name = control.getAttribute('data-name');
+                itemsText += `${name} x ${qty}<br>`;
+            }
+        }
+        
+        document.getElementById('modalOrderDate').textContent = orderData.date;
+        document.getElementById('modalOrderItems').innerHTML = itemsText;
+        document.getElementById('modalOrderTotal').textContent = 'Total: ' + orderData.total;
+        document.getElementById('historyModal').style.display = 'flex';
+    }
+    
+    function showCustomAlert(message) {
+        const content = `
+            <div style="margin-bottom: 20px;">${message}</div>
+            <button onclick="closeCustomPopup()" style="padding: 10px 30px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">OK</button>
+        `;
+        showCustomPopup(content);
+    }
+    
+    function showCustomPopup(content) {
+        document.getElementById('customPopupContent').innerHTML = content;
+        document.getElementById('customPopup').style.display = 'flex';
+    }
+    
+    function closeCustomPopup() {
+        document.getElementById('customPopup').style.display = 'none';
+    }
+    
+    // Reorder last order
+    function reorderLast() {
+        const lastOrder = localStorage.getItem('lastOrder');
+        if (!lastOrder) {
+            alert('No previous order found');
+            return;
+        }
+        
+        const orderData = JSON.parse(lastOrder);
+        cart = {...orderData.cart};
+        updateCart();
+        alert('Items added to cart!');
+    }
+    
+    // Load order history on page load
+    window.addEventListener('load', loadOrderHistory);
+</script>
+
+<!-- Order History Modal -->
+<div id="historyModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center;">
+    <div style="background: white; border-radius: 12px; padding: 24px; max-width: 320px; width: 90%; max-height: 80vh; overflow-y: auto;">
+        <h3 style="margin: 0 0 16px 0; color: var(--primary); font-size: 18px;">Last Order</h3>
+        <div id="modalOrderDate" style="font-size: 12px; color: var(--gray); margin-bottom: 12px;"></div>
+        <div id="modalOrderItems" style="font-size: 14px; color: var(--dark); margin-bottom: 16px; line-height: 1.6;"></div>
+        <div id="modalOrderTotal" style="font-size: 16px; font-weight: 600; color: var(--primary); margin-bottom: 20px; padding-top: 12px; border-top: 1px solid var(--border);"></div>
+        <div style="display: flex; gap: 12px;">
+            <button onclick="closeHistoryModal()" style="flex: 1; padding: 12px; background: var(--light); color: var(--dark); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 14px;">Cancel</button>
+            <button onclick="confirmReorder()" style="flex: 1; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">Reorder</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let tempOrderData = null;
+    
+    function closeHistoryModal() {
+        document.getElementById('historyModal').style.display = 'none';
+        tempOrderData = null;
+    }
+    
+    function confirmReorder() {
+        const lastOrder = localStorage.getItem('lastOrder');
+        if (lastOrder) {
+            const orderData = JSON.parse(lastOrder);
+            cart = {...orderData.cart};
+            updateCart();
+            toggleCart();
+        }
+        closeHistoryModal();
+    }
+</script>
+
+</body>
+</html>
+
+
