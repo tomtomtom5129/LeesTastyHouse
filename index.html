@@ -4,10 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Lee's Tasty House - Online Order</title>
-    
+
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Lee's Tasty House">
+    <meta name="theme-color" content="#c9a227">
+    <meta name="description" content="Online ordering for Chinese cuisine at Lee's Tasty House">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="./data/favicon.png">
     <link rel="apple-touch-icon" href="./data/favicon.png">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#c9a227">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Lee's Tasty House">
+    <meta name="application-name" content="Lee's Tasty House">
+    <meta name="msapplication-TileColor" content="#c9a227">
     
     <!-- Structured Data for Google -->
     <script type="application/ld+json">
@@ -80,6 +99,11 @@
             border-bottom: 1px solid var(--border);
             z-index: 1000;
             padding: 12px 20px;
+            transition: top 0.3s ease;
+        }
+
+        .header.announcement-hidden {
+            top: 0;
         }
         
         .header-content {
@@ -107,12 +131,56 @@
             font-weight: 600;
             color: var(--primary);
         }
+
+        .logo-wrapper {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .open-status {
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .open-status.open {
+            color: #27ae60;
+        }
+
+        .open-status.closed {
+            color: #e74c3c;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-dot.open {
+            background-color: #27ae60;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .status-dot.closed {
+            background-color: #e74c3c;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
         
         /* Announcement Bar */
         .announcement-bar {
             background: var(--accent) !important;
             color: var(--primary);
             padding: 12px 40px 12px 20px;
+            min-height: 42px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -122,7 +190,7 @@
             right: 0;
             font-size: 14px;
             font-weight: 600;
-            z-index: 1001;
+            z-index: 2000;
             animation: pulse 2s ease-in-out infinite;
         }
         
@@ -281,6 +349,11 @@
             padding: 10px 20px;
             -webkit-overflow-scrolling: touch;
             box-shadow: var(--shadow);
+            transition: top 0.3s ease;
+        }
+
+        body.announcement-hidden .top-nav {
+            top: 65px;
         }
         
         .nav-btn {
@@ -356,6 +429,11 @@
             max-width: 800px;
             margin: 0 auto;
             padding: 242px 20px 100px;
+            transition: padding-top 0.3s ease;
+        }
+
+        body.announcement-hidden .main-container {
+            padding-top: 200px;
         }
         
         .category-section {
@@ -1061,6 +1139,10 @@
             .main-container {
                 padding: 130px 16px 80px;
             }
+
+            body.announcement-hidden .main-container {
+                padding-top: 88px;
+            }
             
             .price-col {
                 min-width: 100px;
@@ -1086,7 +1168,7 @@
 <body>
 
 <!-- Announcement Bar -->
-<div id="announcementBar" class="announcement-bar" style="display: none;">
+<div id="announcementBar" class="announcement-bar" style="display: flex; opacity: 0; transition: opacity 0.3s ease;">
     <div class="announcement-content">
         <span id="announcementText"></span>
         <a id="announcementLink" href="" style="display: none;"></a>
@@ -1096,11 +1178,14 @@
 
 <!-- Header -->
 
-<header class="header">
+<header class="header announcement-hidden">
     <div class="header-content">
         <div class="logo">
             <img src="data/favicon.png" alt="Lee's Tasty House Logo" class="logo-img">
-            <span class="logo-text">Lee's Tasty House</span>
+            <div class="logo-wrapper">
+                <span class="logo-text">Lee's Tasty House</span>
+                <span id="openStatus" class="open-status"></span>
+            </div>
         </div>
         <button class="history-btn" id="historyBtn" onclick="showLastOrder()" title="Last Order">
             <img src="data/OIP.webp" alt="History" style="width: 24px; height: 24px; object-fit: contain;">
@@ -2065,44 +2150,67 @@
     
     // Load order history on page load
     window.addEventListener('load', loadOrderHistory);
-    
+
     // Load announcement
     window.addEventListener('load', loadAnnouncement);
+
+    // Update open status
+    window.addEventListener('load', updateOpenStatus);
+    setInterval(updateOpenStatus, 60000); // Update every minute
     
     async function loadAnnouncement() {
         try {
             const response = await fetch('./data/announcement.json');
             const data = await response.json();
             console.log('Announcement data:', data);
-            
-            if (!data.enabled) {
-                console.log('Announcement disabled');
-                return;
-            }
-            
+
             const bar = document.getElementById('announcementBar');
             const text = document.getElementById('announcementText');
             const link = document.getElementById('announcementLink');
-            
+            const header = document.querySelector('.header');
+
+            if (!data.enabled) {
+                console.log('Announcement disabled');
+                bar.style.opacity = '0';
+                setTimeout(() => {
+                    bar.style.display = 'none';
+                }, 300);
+                header.classList.add('announcement-hidden');
+                document.body.classList.add('announcement-hidden');
+                return;
+            }
+
             text.textContent = data.content;
-            
+
             if (data.type) {
                 bar.className = 'announcement-bar ' + data.type;
             }
-            
+
             if (data.link && data.linkText) {
                 link.href = data.link;
                 link.textContent = data.linkText;
                 link.style.display = 'inline';
             }
-            
+
             // Check if user closed it before
             const closed = localStorage.getItem('announcementClosed');
             console.log('Closed content:', closed, 'Current content:', data.content);
-            if (closed !== data.content) {
+            // Always show announcement for testing
+            if (closed !== data.content || true) {
                 bar.style.display = 'flex';
+                setTimeout(() => {
+                    bar.style.opacity = '1';
+                }, 100);
+                header.classList.remove('announcement-hidden');
+                document.body.classList.remove('announcement-hidden');
                 console.log('Showing announcement');
             } else {
+                bar.style.opacity = '0';
+                setTimeout(() => {
+                    bar.style.display = 'none';
+                }, 300);
+                header.classList.add('announcement-hidden');
+                document.body.classList.add('announcement-hidden');
                 console.log('Announcement was closed before');
             }
         } catch (e) {
@@ -2113,8 +2221,48 @@
     function closeAnnouncement() {
         const bar = document.getElementById('announcementBar');
         const text = document.getElementById('announcementText').textContent;
-        bar.style.display = 'none';
+        const header = document.querySelector('.header');
+
+        bar.style.opacity = '0';
+        setTimeout(() => {
+            bar.style.display = 'none';
+        }, 300);
+        header.classList.add('announcement-hidden');
+        document.body.classList.add('announcement-hidden');
         localStorage.setItem('announcementClosed', text);
+    }
+
+    function updateOpenStatus() {
+        const now = new Date();
+        const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+        const currentHour = now.getHours();
+        const currentMinute = now.getMinutes();
+        const currentTime = currentHour * 60 + currentMinute;
+
+        // Business hours (from schema.org data)
+        // Monday (1), Wednesday (3), Thursday (4), Friday (5), Saturday (6), Sunday (0): 12:00-21:00
+        // Tuesday (2): Closed
+
+        let isOpen = false;
+        const openTime = 12 * 60; // 12:00 = 720 minutes
+        const closeTime = 21 * 60; // 21:00 = 1260 minutes
+
+        const openDays = [0, 1, 3, 4, 5, 6]; // Sunday, Mon, Wed, Thu, Fri, Sat
+
+        if (openDays.includes(dayOfWeek)) {
+            if (currentTime >= openTime && currentTime < closeTime) {
+                isOpen = true;
+            }
+        }
+
+        const statusElement = document.getElementById('openStatus');
+        if (isOpen) {
+            statusElement.innerHTML = '<span class="status-dot open"></span>Open';
+            statusElement.className = 'open-status open';
+        } else {
+            statusElement.innerHTML = '<span class="status-dot closed"></span>Closed';
+            statusElement.className = 'open-status closed';
+        }
     }
 </script>
 
