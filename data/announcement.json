@@ -1,0 +1,18 @@
+{
+  "_说明": "公告栏配置文件 - 修改后刷新网页即可生效",
+  "_字段说明": {
+    "enabled": "true=显示公告, false=隐藏公告",
+    "title": "公告标题（可选）",
+    "content": "公告内容文字",
+    "type": "样式类型: info(蓝色), warning(橙色), success(绿色), 留空为默认金色",
+    "link": "点击跳转的链接地址, 不需要则留空",
+    "linkText": "链接显示文字, 不需要则留空"
+  },
+  
+  "enabled": true,
+  "title": "Special Notice",
+  "content": "We open early for special days! Pre-orders are welcomed!",
+  "type": "info",
+  "link": "",
+  "linkText": ""
+}

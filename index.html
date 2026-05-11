@@ -4,6 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Lee's Tasty House - Online Order</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="./data/favicon.png">
+    <link rel="apple-touch-icon" href="./data/favicon.png">
+    
+    <!-- Structured Data for Google -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Restaurant",
+        "name": "Lee's Tasty House",
+        "image": "./data/favicon.png",
+        "url": "https://leestastyhouse.com",
+        "telephone": "+1-905-778-8828",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "17 Holland St E",
+            "addressLocality": "Bradford",
+            "addressRegion": "ON",
+            "postalCode": "L3Z 2B5",
+            "addressCountry": "CA"
+        },
+        "openingHoursSpecification": [
+            {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+                "opens": "12:00",
+                "closes": "21:00"
+            }
+        ],
+        "priceRange": "$"
+    }
+    </script>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -39,7 +73,7 @@
         /* Header */
         .header {
             position: fixed;
-            top: 0;
+            top: 42px;
             left: 0;
             right: 0;
             background: var(--white);
@@ -72,6 +106,75 @@
             font-size: 20px;
             font-weight: 600;
             color: var(--primary);
+        }
+        
+        /* Announcement Bar */
+        .announcement-bar {
+            background: var(--accent) !important;
+            color: var(--primary);
+            padding: 12px 40px 12px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 1001;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.4); }
+            50% { box-shadow: 0 0 20px 5px rgba(201, 162, 39, 0.6); }
+        }
+        
+        .announcement-content {
+            text-align: center;
+        }
+        
+        .announcement-bar.info {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .announcement-bar.warning {
+            background: #fff3e0;
+            color: #e65100;
+        }
+        
+        .announcement-bar.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .announcement-content {
+            text-align: center;
+        }
+        
+        .announcement-content a {
+            color: inherit;
+            text-decoration: underline;
+            margin-left: 8px;
+            font-weight: 600;
+        }
+        
+        .announcement-close {
+            position: absolute;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: inherit;
+            opacity: 0.6;
+            padding: 0 5px;
+        }
+        
+        .announcement-close:hover {
+            opacity: 1;
         }
         
         .cart-btn {
@@ -167,7 +270,7 @@
         /* Navigation */
         .top-nav {
             position: fixed;
-            top: 65px;
+            top: 107px;
             left: 0;
             right: 0;
             background: var(--white);
@@ -202,7 +305,7 @@
         
         /* Info Section */
         .info-section {
-            padding: 150px 20px 30px;
+            padding: 192px 20px 30px;
             background: var(--light);
         }
         
@@ -252,7 +355,7 @@
         .main-container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 200px 20px 100px;
+            padding: 242px 20px 100px;
         }
         
         .category-section {
@@ -982,12 +1085,21 @@
 </head>
 <body>
 
+<!-- Announcement Bar -->
+<div id="announcementBar" class="announcement-bar" style="display: none;">
+    <div class="announcement-content">
+        <span id="announcementText"></span>
+        <a id="announcementLink" href="" style="display: none;"></a>
+    </div>
+    <button class="announcement-close" onclick="closeAnnouncement()">&times;</button>
+</div>
+
 <!-- Header -->
 
 <header class="header">
     <div class="header-content">
         <div class="logo">
-            <img src="data/logo.png" alt="Lee's Tasty House Logo" class="logo-img">
+            <img src="data/favicon.png" alt="Lee's Tasty House Logo" class="logo-img">
             <span class="logo-text">Lee's Tasty House</span>
         </div>
         <button class="history-btn" id="historyBtn" onclick="showLastOrder()" title="Last Order">
@@ -1953,6 +2065,57 @@
     
     // Load order history on page load
     window.addEventListener('load', loadOrderHistory);
+    
+    // Load announcement
+    window.addEventListener('load', loadAnnouncement);
+    
+    async function loadAnnouncement() {
+        try {
+            const response = await fetch('./data/announcement.json');
+            const data = await response.json();
+            console.log('Announcement data:', data);
+            
+            if (!data.enabled) {
+                console.log('Announcement disabled');
+                return;
+            }
+            
+            const bar = document.getElementById('announcementBar');
+            const text = document.getElementById('announcementText');
+            const link = document.getElementById('announcementLink');
+            
+            text.textContent = data.content;
+            
+            if (data.type) {
+                bar.className = 'announcement-bar ' + data.type;
+            }
+            
+            if (data.link && data.linkText) {
+                link.href = data.link;
+                link.textContent = data.linkText;
+                link.style.display = 'inline';
+            }
+            
+            // Check if user closed it before
+            const closed = localStorage.getItem('announcementClosed');
+            console.log('Closed content:', closed, 'Current content:', data.content);
+            if (closed !== data.content) {
+                bar.style.display = 'flex';
+                console.log('Showing announcement');
+            } else {
+                console.log('Announcement was closed before');
+            }
+        } catch (e) {
+            console.log('Error loading announcement:', e);
+        }
+    }
+    
+    function closeAnnouncement() {
+        const bar = document.getElementById('announcementBar');
+        const text = document.getElementById('announcementText').textContent;
+        bar.style.display = 'none';
+        localStorage.setItem('announcementClosed', text);
+    }
 </script>
 
 <!-- Order History Modal -->
