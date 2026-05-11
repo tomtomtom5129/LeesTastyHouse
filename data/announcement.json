@@ -9,7 +9,7 @@
     "linkText": "链接显示文字, 不需要则留空"
   },
   
-  "enabled": false,
+  "enabled": true,
   "title": "Special Notice",
   "content": "We open early for special days! Pre-orders are welcomed!",
   "type": "info",
