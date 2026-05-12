@@ -13,6 +13,7 @@
     <link rel="manifest" href="./manifest.json">
 
     <!-- iOS Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Lee's Tasty House">
@@ -2316,14 +2317,12 @@
             deferredPrompt.prompt();
             deferredPrompt.userChoice.then((choiceResult) => {
                 if (choiceResult.outcome === 'accepted') {
-                    console.log('User accepted the install prompt');
                     installPromptShown = true;
                     const installPrompt = document.querySelector('.install-prompt');
                     if (installPrompt) {
                         installPrompt.style.display = 'none';
                     }
                 } else {
-                    console.log('User dismissed the install prompt');
                     localStorage.setItem('installPromptDismissed', 'true');
                     const installPrompt = document.querySelector('.install-prompt');
                     if (installPrompt) {
@@ -2386,7 +2385,6 @@ On Desktop:
         try {
             const response = await fetch('./data/announcement.json');
             const data = await response.json();
-            console.log('Announcement data:', data);
 
             const bar = document.getElementById('announcementBar');
             const text = document.getElementById('announcementText');
@@ -2394,7 +2392,6 @@ On Desktop:
             const header = document.querySelector('.header');
 
             if (!data.enabled) {
-                console.log('Announcement disabled');
                 bar.style.opacity = '0';
                 setTimeout(() => {
                     bar.style.display = 'none';
@@ -2418,7 +2415,6 @@ On Desktop:
 
             // Check if user closed it before
             const closed = localStorage.getItem('announcementClosed');
-            console.log('Closed content:', closed, 'Current content:', data.content);
             // Always show announcement for testing
             if (closed !== data.content || true) {
                 bar.style.display = 'flex';
@@ -2427,7 +2423,6 @@ On Desktop:
                 }, 100);
                 header.classList.remove('announcement-hidden');
                 document.body.classList.remove('announcement-hidden');
-                console.log('Showing announcement');
             } else {
                 bar.style.opacity = '0';
                 setTimeout(() => {
@@ -2435,10 +2430,9 @@ On Desktop:
                 }, 300);
                 header.classList.add('announcement-hidden');
                 document.body.classList.add('announcement-hidden');
-                console.log('Announcement was closed before');
             }
         } catch (e) {
-            console.log('Error loading announcement:', e);
+            // Silent error handling
         }
     }
     
