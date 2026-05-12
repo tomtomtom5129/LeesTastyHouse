@@ -1,8 +1,8 @@
 {
   "name": "Lee's Tasty House",
   "short_name": "Lee's Tasty House",
-  "description": "Online ordering for Chinese cuisine",
-  "start_url": ".",
+  "description": "Order delicious Chinese food online",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#c9a227",
